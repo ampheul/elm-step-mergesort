@@ -145,10 +145,10 @@ estimateBestCase (Sorting merged unmerged (Merging stack ( l, ls ) ( r, rs ))) =
             List.map (\( z, zs ) -> 1 + List.length zs)
 
         mergingLength =
-            List.length ls + List.length rs + 2
+            List.length ls + List.length rs + List.length stack + 2
     in
     recurse
-        ((mergingLength + List.length stack) :: lengths merged)
+        (mergingLength :: lengths merged)
         (lengths unmerged)
         + min (List.length rs) (List.length ls)
         + 1
