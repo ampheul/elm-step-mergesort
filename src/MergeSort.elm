@@ -1,18 +1,20 @@
 module MergeSort exposing
-    ( Sorting
+    ( MergeSorting
+    , MergeSortResult
     , choices
-    , estimateBestCase
-    , estimateWorstCase
+    , mergeSortWorstCase
+    , mergeSortBestCase
     , initMergeSort
     , mergeSortStep
     )
+
+
 
 -- UTILITY
 
 
 type alias Nonempty a =
     ( a, List a )
-
 
 consNonempty : a -> Nonempty a -> Nonempty a
 consNonempty x ( y, ys ) =
@@ -23,20 +25,20 @@ consNonempty x ( y, ys ) =
 -- EXPORTS
 
 
-choices : Sorting a -> ( a, a )
-choices (Sorting _ _ (Merging _ ( x, _ ) ( y, _ ))) =
+choices : MergeSorting a -> ( a, a )
+choices (MergeSorting _ _ (Merging _ ( x, _ ) ( y, _ ))) =
     ( x, y )
 
 
-
+        
 -- MERGE
 
 
-type Merging a
-    = Merging (List a) (Nonempty a) (Nonempty a)
+type Merging a = Merging (List a) (Nonempty a) (Nonempty a)
 
+type alias MergeResult a = Result (Nonempty a) (Merging a)
 
-mergeStep : Order -> Merging a -> Result (Nonempty a) (Merging a)
+mergeStep : Order -> Merging a -> MergeResult a
 mergeStep ord ((Merging stack left right) as merging) =
     case ( ord, merging ) of
         ( EQ, _ ) ->
@@ -55,47 +57,48 @@ mergeStep ord ((Merging stack left right) as merging) =
             Err <| List.foldl consNonempty ( r, l :: ls ) stack
 
 
-
+                
 -- MERGESORT
 
 
-type Sorting a
-    = Sorting (List (Nonempty a)) (List (Nonempty a)) (Merging a)
+type MergeSorting a
+    = MergeSorting (List (Nonempty a)) (List (Nonempty a)) (Merging a)
 
+type alias MergeSortResult a = Result (List a) (MergeSorting a) 
 
-initMergeSort : List a -> Result (List a) (Sorting a)
+initMergeSort : List a -> MergeSortResult a
 initMergeSort xs =
     case xs of
         x :: y :: ys ->
             Ok <|
-                Sorting [] (List.map (\z -> ( z, [] )) ys) <|
+                MergeSorting [] (List.map (\z -> ( z, [] )) ys) <|
                     Merging [] ( x, [] ) ( y, [] )
 
         _ ->
             Err xs
 
 
-mergeSortStep : Order -> Sorting a -> Result (Nonempty a) (Sorting a)
-mergeSortStep ord ((Sorting merged unmerged merging) as sorting) =
+mergeSortStep : Order -> MergeSorting a -> MergeSortResult a
+mergeSortStep ord ((MergeSorting merged unmerged merging) as sorting) =
     case ( mergeStep ord merging, merged, unmerged ) of
         ( Ok out, _, _ ) ->
-            Ok <| Sorting merged unmerged out
+            Ok <| MergeSorting merged unmerged out
 
         ( Err out, _, x :: y :: ys ) ->
-            Ok <| Sorting (out :: merged) ys <| Merging [] x y
+            Ok <| MergeSorting (out :: merged) ys <| Merging [] x y
 
         ( Err out, _, [ x ] ) ->
-            Ok <| Sorting merged [] <| Merging [] x out
+            Ok <| MergeSorting merged [] <| Merging [] x out
 
         ( Err out, x :: xs, [] ) ->
-            Ok <| Sorting [] xs <| Merging [] out x
+            Ok <| MergeSorting [] xs <| Merging [] out x
 
-        ( Err out, [], [] ) ->
-            Err out
+        ( Err (x,xs), [], [] ) ->
+            Err <| x::xs
 
 
-estimateWorstCase : Sorting a -> Int
-estimateWorstCase (Sorting merged unmerged (Merging stack ( l, ls ) ( r, rs ))) =
+mergeSortWorstCase : MergeSorting a -> Int
+mergeSortWorstCase (MergeSorting merged unmerged (Merging stack ( l, ls ) ( r, rs ))) =
     let
         recurse ts xs =
             case ( ts, xs ) of
@@ -124,8 +127,8 @@ estimateWorstCase (Sorting merged unmerged (Merging stack ( l, ls ) ( r, rs ))) 
         - 1
 
 
-estimateBestCase : Sorting a -> Int
-estimateBestCase (Sorting merged unmerged (Merging stack ( l, ls ) ( r, rs ))) =
+mergeSortBestCase : MergeSorting a -> Int
+mergeSortBestCase (MergeSorting merged unmerged (Merging stack ( l, ls ) ( r, rs ))) =
     let
         recurse ts xs =
             case ( ts, xs ) of
@@ -152,3 +155,4 @@ estimateBestCase (Sorting merged unmerged (Merging stack ( l, ls ) ( r, rs ))) =
         (lengths unmerged)
         + min (List.length rs) (List.length ls)
         + 1
+
