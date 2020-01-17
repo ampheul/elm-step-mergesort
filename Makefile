@@ -1,5 +1,5 @@
 COMPILER = elm make
-FLAGS = --output="src/elm.js"
+FLAGS = --output="elm.js"
 SOURCES = src/Main.elm
 
 
