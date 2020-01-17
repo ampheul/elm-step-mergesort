@@ -3,6 +3,7 @@
 }
 
 h1 {
+    font-size: 40pt;
     color : #FF5794;
 }
 
@@ -12,6 +13,7 @@ body {
     color : #F9F5DD;
     font-family : Arial;
     text-align : center;
+    font-size: 12pt;
 }
 
 .button-class {
@@ -20,6 +22,11 @@ body {
     border-radius : 5px;
     padding : 5px;
     margin : 10px;
+    font-size: 20pt;
+    transition: box-shadow 0.1s;
+}
+.button-class:hover {
+    box-shadow: 0 0px 20px 0 rgba(255, 255, 255, 0.5), 0 0px 25px 0 rgba(255, 255, 255, 0.4);
 }
 
 .row {
@@ -65,6 +72,8 @@ body {
 }    
 
 ol.done {
+    display: table;
+    vertical-align: middle;
     margin: 0 auto;
     text-align: center;
     width: 80%;
@@ -74,14 +83,13 @@ ol.done {
 
 ol.done li img {
     float : right;
-    width : 80px;
-    height: 80px;
-    padding-left: 10px;
+    width : 120px;
+    height: 120px;
 }
 
 ol.done li {
+    text-shadow: 2px 2px 5px #000000;
     width: 100%;
-    vertical-align: middle;
     font-size: 20pt;
     counter-increment : rating;
     background-color: #66CEE1;
@@ -92,6 +100,7 @@ ol.done li {
 }
 
 ol.done li::before {
+    
     float: left;
     content : counter(rating);
     font-size : 40pt;
@@ -107,3 +116,10 @@ ol.done li::after {
     text-align : center;
 }
 
+button.main {
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin: 0 auto;
+    transform: translate(-50%,-50%);
+}
